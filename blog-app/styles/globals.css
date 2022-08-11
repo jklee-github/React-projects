@@ -1,0 +1,13 @@
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* overwrite the defualt amamzon color */
+:root {
+  --amplify-primary-color: #d84890;
+  --amplify-primary-tint: #498a49;
+  --amplify-primary-shade: #c9794b;
+}
