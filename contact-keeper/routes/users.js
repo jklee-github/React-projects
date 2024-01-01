@@ -1,12 +1,12 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 // hashing password
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { check, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const config = require('config')
+const { check, validationResult } = require('express-validator')
 
-const User = require('../models/User');
+const User = require('../models/User')
 
 // @route     POST api/users
 // @desc      Regiter a user
@@ -20,56 +20,57 @@ router.post(
     'Please enter a password with 6 or more characters'
   ).isLength({ min: 6 }),
   async (req, res) => {
-    const errors = validationResult(req);
+    const errors = validationResult(req)
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() })
     }
 
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body
 
     try {
       // mongoose findOne()
-      let user = await User.findOne({ email });
+      let user = await User.findOne({ email })
 
       if (user) {
-        return res.status(400).json({ msg: 'User already exists' });
+        return res.status(400).json({ msg: 'User already exists' })
       }
 
       user = new User({
         name,
         email,
-        password
-      });
+        password,
+      })
 
-      const salt = await bcrypt.genSalt(10);
-
-      user.password = await bcrypt.hash(password, salt);
+      // encypt the password
+      const salt = await bcrypt.genSalt(10)
+      user.password = await bcrypt.hash(password, salt)
       // save to the database
-      await user.save();
+      await user.save()
+
       // oject want to sent in the token
       const payload = {
         user: {
-          id: user.id
-        }
-      };
+          id: user.id,
+        },
+      }
       // to generate the token
       jwt.sign(
         payload,
         config.get('jwtSecret'),
         {
-          expiresIn: 360000
+          expiresIn: 360000,
         },
         (err, token) => {
-          if (err) throw err;
-          // return back the JWT token
-          res.json({ token });
+          if (err) throw err
+          // return back the JWT token to response
+          res.json({ token })
         }
-      );
+      )
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server Error');
+      console.error(err.message)
+      res.status(500).send('Server Error')
     }
   }
-);
+)
 
-module.exports = router;
+module.exports = router
